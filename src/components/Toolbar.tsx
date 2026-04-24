@@ -61,7 +61,7 @@ export default function Toolbar({
   };
 
   return (
-    <aside className="w-80 glass-panel ml-4 mb-4 mt-0 p-5 flex flex-col gap-6 overflow-y-auto z-10 shadow-sm">
+    <aside className="w-full sm:w-80 glass-panel mx-4 sm:ml-4 sm:mx-0 mb-4 mt-0 p-5 flex flex-col gap-6 overflow-y-auto z-10 shadow-sm shrink-0 sm:shrink">
       {/* 액션 그룹 */}
       <div className="flex flex-col gap-3">
         <h2 className="text-sm font-bold text-gray-500 uppercase tracking-widest">기본 액션</h2>
@@ -104,13 +104,10 @@ export default function Toolbar({
         <h2 className="text-sm font-bold text-gray-500 uppercase tracking-widest">스티커 편집</h2>
         
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-semibold text-gray-600">내용 (줄바꿈 가능)</label>
-          <textarea 
-            value={selectedSticker?.text || ''}
-            onChange={(e) => onUpdateSticker({ text: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white/50 resize-y min-h-[80px]"
-            placeholder="텍스트를 입력하세요"
-          />
+          <label className="text-xs font-semibold text-gray-600">내용 수정 방법</label>
+          <div className="text-sm text-indigo-600 bg-indigo-50 p-2 rounded-lg border border-indigo-100">
+            💡 캔버스의 스티커를 <b>더블클릭(더블탭)</b> 하시면 바로 글씨를 수정할 수 있습니다.
+          </div>
         </div>
 
         <div className="flex flex-col gap-2">

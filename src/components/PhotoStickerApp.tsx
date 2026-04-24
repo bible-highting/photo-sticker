@@ -175,7 +175,7 @@ export default function PhotoStickerApp() {
       </header>
 
       {/* 메인 영역 */}
-      <div className="flex flex-1 overflow-hidden relative pb-4">
+      <div className="flex flex-col sm:flex-row flex-1 overflow-hidden relative pb-4">
         {/* 툴바 (사이드바) */}
         <Toolbar 
           onAddText={() => addSticker('text')}
@@ -189,7 +189,7 @@ export default function PhotoStickerApp() {
 
         {/* 캔버스 래퍼 영역 */}
         <main 
-          className={`flex-1 flex flex-col items-center justify-center relative transition-all duration-300 mr-4 ml-4 sm:ml-0 rounded-2xl border-2 ${isDragging ? 'border-[var(--primary)] bg-[var(--primary)]/10' : 'border-transparent'}`} 
+          className={`flex-1 flex flex-col items-center justify-center relative transition-all duration-300 mx-4 sm:ml-0 rounded-2xl border-2 ${isDragging ? 'border-[var(--primary)] bg-[var(--primary)]/10' : 'border-transparent'} min-h-[300px]`} 
           style={{ background: 'rgba(255,255,255,0.4)', backdropFilter: 'blur(10px)' }}
           onDragOver={onDragOver}
           onDragEnter={onDragEnter}

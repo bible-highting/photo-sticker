@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { Stage, Layer, Image as KonvaImage, Text, Label, Tag, Transformer, Group } from 'react-konva';
+import { Html } from 'react-konva-utils';
 import useImage from 'use-image';
 import { StickerData } from '../types';
 
@@ -150,32 +151,66 @@ const StickerNode = ({ sticker, isSelected, onSelect, onChange }: StickerNodePro
     });
   };
 
+  const [isEditing, setIsEditing] = useState(false);
+  const startEdit = () => setIsEditing(true);
+  const handleBlur = () => setIsEditing(false);
+
   return (
     <>
       {sticker.type === 'text' ? (
-        <Text
+        <Group
           ref={shapeRef}
           x={sticker.x}
           y={sticker.y}
-          text={sticker.text}
-          fontFamily={sticker.fontFamily}
-          fontSize={sticker.fontSize}
-          fill={sticker.fill}
           draggable
           onClick={onSelect}
           onTap={onSelect}
+          onDblClick={startEdit}
+          onDblTap={startEdit}
           onDragEnd={handleDragEnd}
           onTransformEnd={handleTransformEnd}
           scaleX={sticker.scaleX || 1}
           scaleY={sticker.scaleY || 1}
           rotation={sticker.rotation || 0}
-          shadowColor={sticker.hasShadow ? "rgba(0,0,0,0.5)" : undefined}
-          shadowBlur={sticker.hasShadow ? 5 : 0}
-          shadowOffset={sticker.hasShadow ? { x: 2, y: 2 } : { x: 0, y: 0 }}
-          stroke={sticker.stroke || undefined}
-          strokeWidth={sticker.strokeWidth || 0}
-          padding={5}
-        />
+        >
+          <Text
+            text={sticker.text}
+            fontFamily={sticker.fontFamily}
+            fontSize={sticker.fontSize}
+            fill={sticker.fill}
+            opacity={isEditing ? 0 : 1}
+            shadowColor={sticker.hasShadow ? "rgba(0,0,0,0.5)" : undefined}
+            shadowBlur={sticker.hasShadow ? 5 : 0}
+            shadowOffset={sticker.hasShadow ? { x: 2, y: 2 } : { x: 0, y: 0 }}
+            stroke={sticker.stroke || undefined}
+            strokeWidth={sticker.strokeWidth || 0}
+            padding={5}
+          />
+          {isEditing && (
+            <Html transform>
+              <textarea
+                value={sticker.text}
+                onChange={(e) => onChange({ text: e.target.value })}
+                onBlur={handleBlur}
+                autoFocus
+                style={{
+                  width: `${Math.max(100, sticker.text.length * (sticker.fontSize / 2))}px`,
+                  minHeight: '40px',
+                  border: '2px dashed #4F46E5',
+                  padding: '5px',
+                  margin: 0,
+                  background: 'rgba(255,255,255,0.8)',
+                  outline: 'none',
+                  resize: 'both',
+                  color: sticker.fill,
+                  fontSize: `${sticker.fontSize}px`,
+                  fontFamily: sticker.fontFamily,
+                  lineHeight: 1.2,
+                }}
+              />
+            </Html>
+          )}
+        </Group>
       ) : (
         <Group
           ref={shapeRef}
@@ -184,6 +219,8 @@ const StickerNode = ({ sticker, isSelected, onSelect, onChange }: StickerNodePro
           draggable
           onClick={onSelect}
           onTap={onSelect}
+          onDblClick={startEdit}
+          onDblTap={startEdit}
           onDragEnd={handleDragEnd}
           onTransformEnd={handleTransformEnd}
           scaleX={sticker.scaleX || 1}
@@ -213,8 +250,34 @@ const StickerNode = ({ sticker, isSelected, onSelect, onChange }: StickerNodePro
               fill={sticker.fill}
               padding={16}
               align="center"
+              opacity={isEditing ? 0 : 1}
             />
           </Label>
+          {isEditing && (
+            <Html transform>
+              <textarea
+                value={sticker.text}
+                onChange={(e) => onChange({ text: e.target.value })}
+                onBlur={handleBlur}
+                autoFocus
+                style={{
+                  width: `${Math.max(120, sticker.text.length * (sticker.fontSize / 2))}px`,
+                  minHeight: '60px',
+                  border: '2px dashed #4F46E5',
+                  padding: '16px',
+                  margin: 0,
+                  background: 'transparent',
+                  outline: 'none',
+                  resize: 'both',
+                  color: sticker.fill,
+                  fontSize: `${sticker.fontSize}px`,
+                  fontFamily: sticker.fontFamily,
+                  textAlign: 'center',
+                  lineHeight: 1.2,
+                }}
+              />
+            </Html>
+          )}
         </Group>
       )}
 
