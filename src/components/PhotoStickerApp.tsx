@@ -14,16 +14,44 @@ export default function PhotoStickerApp() {
   const [bgImageSrc, setBgImageSrc] = useState<string | null>(null);
   const [stickers, setStickers] = useState<StickerData[]>([]);
   const [selectedStickerId, setSelectedStickerId] = useState<string | null>(null);
+  const [copiedSticker, setCopiedSticker] = useState<StickerData | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
-  // 키보드로 스티커 삭제 (Delete / Backspace 키)
+  // 키보드로 스티커 액션 처리 (삭제, 복사, 붙여넣기)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // 텍스트를 입력 중(input, textarea)일 때는 삭제되지 않도록 예외 처리
+      // 텍스트를 입력 중(input, textarea)일 때는 작동하지 않도록 예외 처리
       if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') {
         return;
       }
       
+      const isCmdOrCtrl = e.metaKey || e.ctrlKey;
+
+      // 복사 (Ctrl+C / Cmd+C)
+      if (isCmdOrCtrl && e.key.toLowerCase() === 'c') {
+        if (selectedStickerId) {
+          const stickerToCopy = stickers.find(s => s.id === selectedStickerId);
+          if (stickerToCopy) setCopiedSticker(stickerToCopy);
+        }
+      }
+
+      // 붙여넣기 (Ctrl+V / Cmd+V)
+      if (isCmdOrCtrl && e.key.toLowerCase() === 'v') {
+        if (copiedSticker) {
+          const newSticker: StickerData = {
+            ...copiedSticker,
+            id: Date.now().toString(),
+            x: copiedSticker.x + 20,
+            y: copiedSticker.y + 20,
+          };
+          setStickers((prev) => [...prev, newSticker]);
+          setSelectedStickerId(newSticker.id);
+          // 연속 붙여넣기 시 계단식으로 생성되도록 참조 갱신
+          setCopiedSticker(newSticker);
+        }
+      }
+
+      // 삭제 (Delete / Backspace)
       if ((e.key === 'Delete' || e.key === 'Backspace') && selectedStickerId) {
         setStickers((prev) => prev.filter((st) => st.id !== selectedStickerId));
         setSelectedStickerId(null);
@@ -32,7 +60,7 @@ export default function PhotoStickerApp() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedStickerId]);
+  }, [selectedStickerId, stickers, copiedSticker]);
 
   // 새로운 스티커 추가
   const addSticker = (type: 'text' | 'speech_bubble') => {
