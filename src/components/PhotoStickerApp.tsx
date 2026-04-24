@@ -165,18 +165,50 @@ export default function PhotoStickerApp() {
   const selectedSticker = stickers.find(s => s.id === selectedStickerId);
 
   return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden">
-      {/* 헤더 */}
-      <header className="glass-panel mx-4 my-3 p-4 flex justify-between items-center z-10 shadow-sm shrink-0">
-        <h1 className="text-xl font-bold bg-clip-text text-transparent" style={{ backgroundImage: 'var(--bg-gradient)', WebkitTextFillColor: 'transparent', WebkitBackgroundClip: 'text', color: 'var(--primary)' }}>
-         Photo Sticker Web
-        </h1>
-        <div className="text-sm text-gray-500 font-medium">프리미엄 사진 꾸미기</div>
-      </header>
+    <div className="flex flex-col h-screen w-screen overflow-hidden bg-neutral-950 text-white relative">
+      {/* 캔버스 래퍼 영역 (전체 화면 릴스 스타일) */}
+      <main 
+        className={`flex-1 w-full h-full flex flex-col items-center justify-center relative transition-colors duration-300 ${isDragging ? 'bg-indigo-500/20' : 'bg-neutral-950'}`} 
+        onDragOver={onDragOver}
+        onDragEnter={onDragEnter}
+        onDragLeave={onDragLeave}
+        onDrop={onDrop}
+      >
+        {!bgImageSrc && (
+          <div className="absolute top-8 left-6 opacity-30 select-none pointer-events-none z-0">
+            <h1 className="text-xl font-bold tracking-wider text-white">
+             Photo Sticker Web
+            </h1>
+          </div>
+        )}
 
-      {/* 메인 영역 */}
-      <div className="flex flex-col sm:flex-row flex-1 overflow-hidden relative pb-4">
-        {/* 툴바 (사이드바) */}
+        {bgImageSrc ? (
+          <div className="w-full h-full flex items-center justify-center relative p-0 sm:p-4">
+            <div className="w-full h-full relative" style={{ maxWidth: '1200px' }}>
+              <StickerCanvas 
+                bgImageSrc={bgImageSrc}
+                stickers={stickers}
+                selectedStickerId={selectedStickerId}
+                onSelectSticker={setSelectedStickerId}
+                onChangeSticker={updateSticker}
+                onDeselect={deselectSticker}
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center text-white/50 gap-6 w-full h-full pointer-events-none relative z-10">
+            <div className={`p-8 rounded-full bg-white/5 backdrop-blur-md transition-all ${isDragging ? 'scale-110 bg-indigo-500/30 text-indigo-300' : ''}`}>
+              <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+            <p className="text-lg font-medium">
+              {isDragging ? '여기에 사진을 놓아주세요!' : '사진을 드래그하거나 우측 아이콘으로 불러오세요'}
+            </p>
+          </div>
+        )}
+
+        {/* 릴스 스타일 플로팅 오버레이 툴바 */}
         <Toolbar 
           onAddText={() => addSticker('text')}
           onAddSpeechBubble={() => addSticker('speech_bubble')}
@@ -186,45 +218,7 @@ export default function PhotoStickerApp() {
           onDeleteSticker={() => selectedStickerId && deleteSticker(selectedStickerId)}
           hasImage={!!bgImageSrc}
         />
-
-        {/* 캔버스 래퍼 영역 */}
-        <main 
-          className={`flex-1 flex flex-col items-center justify-center relative transition-all duration-300 mx-4 sm:ml-0 rounded-2xl border-2 ${isDragging ? 'border-[var(--primary)] bg-[var(--primary)]/10' : 'border-transparent'} min-h-[300px]`} 
-          style={{ background: 'rgba(255,255,255,0.4)', backdropFilter: 'blur(10px)' }}
-          onDragOver={onDragOver}
-          onDragEnter={onDragEnter}
-          onDragLeave={onDragLeave}
-          onDrop={onDrop}
-        >
-          {bgImageSrc ? (
-            // w-full h-full이 제대로 확보되도록 컨테이너 설정
-            <div className="w-full h-full p-4 flex items-center justify-center">
-              <div className="shadow-2xl rounded-lg overflow-hidden border border-[var(--glass-border)] bg-gray-100 flex items-center justify-center relative"
-                   style={{ width: '100%', height: '100%' }}>
-                <StickerCanvas 
-                  bgImageSrc={bgImageSrc}
-                  stickers={stickers}
-                  selectedStickerId={selectedStickerId}
-                  onSelectSticker={setSelectedStickerId}
-                  onChangeSticker={updateSticker}
-                  onDeselect={deselectSticker}
-                />
-              </div>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center text-gray-400 gap-4 w-full h-full pointer-events-none">
-              <div className={`p-8 rounded-full ${isDragging ? 'bg-[var(--primary)]/20 animate-pulse' : 'bg-white/50'}`}>
-                <svg className={`w-20 h-20 ${isDragging ? 'text-[var(--primary)]' : 'opacity-30'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                </svg>
-              </div>
-              <p className="text-xl font-semibold text-gray-500">
-                {isDragging ? '여기에 사진을 놓아주세요!' : '사진을 드래그해서 놓거나 좌측 버튼으로 불러오세요'}
-              </p>
-            </div>
-          )}
-        </main>
-      </div>
+      </main>
     </div>
   );
 }
